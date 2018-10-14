@@ -1,0 +1,28 @@
+#!/bin/bash
+while :
+do
+li[0]=""
+i=0
+for list in `ps aux | grep chromium | grep -v grep`
+do
+li[$i]=$list
+i=`expr $i + 1 `
+done
+cpu[0]=0
+i=0
+k=0
+for ((j=0;j<i;j++))
+do
+	if [ "pi" = "${li[$j]}" ]
+then
+	cpu[$k]=${li[$j+2]}
+	
+	echo ${cpu[$k]}"%"
+let k=($k + 1)
+
+fi
+k=0
+done
+
+
+

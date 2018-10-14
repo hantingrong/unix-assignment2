@@ -1,0 +1,178 @@
+#!/bin/bash
+cd
+cd ..
+cd ..
+cd sys/class/leds
+#file=(*)
+dir=$(ls)
+i=0
+file[0]=""
+for li in $dir
+do
+	file[$i]=$li
+	let i=($i + 1)
+done	
+filesize=${#file[@]}
+i=0
+
+k="."
+k2="quit"
+k3=")"
+
+
+listNum=0
+bool=0
+selectNum=0
+
+function event1()
+{
+while :
+do	
+    echo "Associate Led with a system Event"
+    echo "==================================="
+    echo "Available events are :"
+    echo "* means current event"
+    echo "---------------------"
+    listNum=0
+	for list in $(cat /sys/class/leds/$led/trigger)
+				do
+					listArray[$listNum]=$list ;
+				     let listNum=($listNum + 1) ;
+				   list=`echo	${list/\]/\*}`;
+				   list=`echo	${list/\[}`;
+					echo $listNum$k3$list ;
+					
+			   done
+			   let quit0=($listNum + 1) ;
+			   echo "$quit0)back to previous menu"
+			   for ((x=0 ; x<$listNum ; x++))
+                   do
+			   let array[$x]=($x + 1)
+		   done
+		   let max=($listNum + 1)
+	           echo -n "please enter a number (1-$max):"
+		   read   select3
+		   for ((x=1 ; x<=$listNum ; x++))
+		   do
+			   expr $select3 + 0 &>/dev/null
+			 
+			   [ $? -ne 0 ]&&{ echo "input must be interger !" ; bool=1 ; break 1 ; }
+			
+  
+			   if [ "$select3" -eq "$x" ]
+			   then 
+				
+                                 selectNum=$x
+			 elif [ "$select3" -eq "$quit0" ]
+			 then
+			break 2
+	               
+                         fi
+		   done
+		            if [ "$bool" -ne "1" ]
+			    then
+                               selectNum=`expr $selectNum - 1`
+                           echo ${listArray[$selectNum]} | sudo tee /sys/class/leds/$led/trigger
+		            fi
+done
+}
+
+while :
+do
+
+echo "Welcome to Led_Konfigurator!"
+echo "==================================="
+echo "Please select an led to configure:"
+for ((j=1 ; j <= $filesize ; j++))
+do
+	led=${file[$j-1]}
+	echo $j$k$led
+
+done
+
+echo $j$k$k2
+ 
+echo -n "Please enter a number (1-$j) for the led to configure or quit: "
+read  select1
+
+
+for ((m=1 ; m <=$j ; m++))
+do
+			   expr $select1 + 0 &>/dev/null
+			 
+			   [ $? -ne 0 ]&&{ echo "input must be interger !" ;  break 1 ; }
+			
+
+	
+	if [ "$select1" -eq "$j" ]
+then
+
+	exit
+
+
+  elif [ "$select1" -eq "$m" ]	
+then	
+		while :
+		do
+			x=$[m-1]
+			
+			led=${file[$x]}
+                        
+			echo $led
+		
+	
+	echo "What would you like to do with this led?"
+		echo "1)turn on"
+		echo "2)turn off"
+		echo "3)associate with a sysytem event"
+		echo "4)associate with the performance of a process"
+		echo "5)stop association with a process' performance"
+	        echo "6)quit to main menu"
+		echo -n "please enter a number (1-6) for your choice:"
+		read  select2
+					   expr $select2 + 0 &>/dev/null
+			 
+			   [ $? -ne 0 ]&&{ echo "input must be interger !" ; bool=2 ; break 1 ; }
+	if [ "$bool" -ne "2" ]		
+	then
+		if [ "$select2" -eq "1" ]
+		then
+		echo 1 | sudo tee /sys/class/leds/$led/brightness
+	      elif [ "$select2" -eq "2" ]
+	        then 
+	        echo 0 | sudo tee /sys/class/leds/$led/brightness
+	elif [ "$select2" -eq "3" ]
+	then
+		event1
+	elif [ "$select2" -eq "4" ]
+	then     
+	       0
+	elif [ "$select2" -eq "5" ]
+        then
+	       0
+	elif [ "$select2" -eq "6" ]
+	then
+	       0
+	else 
+	   
+	echo "Invalid input please enter a number (1-6)"	
+	fi
+fi	
+		
+		
+	done
+	
+elif [ "$m" -gt "$j" ]
+then
+echo "Invalid input please re-enter !"
+fi
+
+done
+done
+
+
+
+
+     
+  
+	 
